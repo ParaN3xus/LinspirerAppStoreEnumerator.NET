@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LinspirerAppStoreEnumerator.NET", "LinspirerAppStoreEnumerator.NET\LinspirerAppStoreEnumerator.NET.csproj", "{CE521075-8F4A-411B-916C-87014E16CA8E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CE521075-8F4A-411B-916C-87014E16CA8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE521075-8F4A-411B-916C-87014E16CA8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE521075-8F4A-411B-916C-87014E16CA8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE521075-8F4A-411B-916C-87014E16CA8E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {96FCEFC4-3E28-40A5-AD51-70AD8B51D55E}
+	EndGlobalSection
+EndGlobal
