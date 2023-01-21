@@ -18,7 +18,7 @@ LinspirerAppStoreEnumerator [-option] [value] [-booloptions] ...
 
 - r: Download and save app that has been recalled.
 
-- s : Don't delete `.apk` file. 
+- s: Don't delete `.apk` file. 
 
 ## Thanks to
 
