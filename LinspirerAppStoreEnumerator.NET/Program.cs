@@ -15,6 +15,11 @@ namespace LinspirerAppStoreEnumerator.NET
         {
             var id = (int)AppID;
 
+            Log.WriteLog(Log.LogLevel.Info, $"App ID: {id} started.");
+
+            Log.WriteLog(Log.LogLevel.Error, $"App ID: {id} occurred error!");
+
+            Log.WriteLog(Log.LogLevel.Info, $"App ID: {id} done.");
 
         }
 
