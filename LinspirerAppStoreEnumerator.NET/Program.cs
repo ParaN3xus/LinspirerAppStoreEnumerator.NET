@@ -1,4 +1,5 @@
-﻿using Fclp;
+﻿using Amib.Threading;
+using Fclp;
 using System;
 using System.Security.Cryptography;
 using static LinspirerAppStoreEnumerator.NET.CmdArgsProcessor;
@@ -12,7 +13,7 @@ namespace LinspirerAppStoreEnumerator.NET
     {
         static FluentCommandLineParser<ApplicationArguments> Args = new();
 
-        static void EnumerateApp(Object AppID)
+        static object EnumerateApp(Object AppID)
         {
             var id = 10093;//(int)AppID;
             var download = new Task( () =>
@@ -71,7 +72,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
 
             Log.WriteLog(Log.LogLevel.Info, $"App ID: {id} done.");
-            Thread.Sleep(500);
+            return 0;
         }
 
         public static int Main(string[] RawArgs)
@@ -79,23 +80,23 @@ namespace LinspirerAppStoreEnumerator.NET
             var argp = new CmdArgsProcessor();
             argp.ProcessArgs();
             Args = argp.Args;
+            
 
             if (Args.Parse(RawArgs).HasErrors)
             {
                 return 1;
             }
 
-            ThreadPool.SetMaxThreads(Args.Object.NumThread, Args.Object.NumThread);
+            var pool = new SmartThreadPool();
+
+            pool.MaxQueueLength=Args.Object.NumThread;
 
             for (var i = Args.Object.FromId; i <= Args.Object.ToId; i++)
             {
-                ThreadPool.QueueUserWorkItem(EnumerateApp, i);
+                pool.QueueWorkItem(callback: EnumerateApp, state: i);
             }
-
-            while (ThreadPool.CompletedWorkItemCount < Args.Object.ToId - Args.Object.FromId + 1)
-            {
-                Thread.Sleep(100);
-            }
+                
+            pool.WaitForIdle();
 
             return 0;
         }
