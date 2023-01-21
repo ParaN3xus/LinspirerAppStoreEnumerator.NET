@@ -1,55 +1,29 @@
 ﻿using Fclp;
 using System;
+using static LinspirerAppStoreEnumerator.NET.CommandLineArgumentsProcessor;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace LinspirerAppStoreEnumerator.NET
 {
-    public class ApplicationArguments
-    {
-        public int FromId { get; set; }
-        public int ToId { get; set; }
-        public int NumThread { get; set; }
-        public bool IsSaveApk { get; set; }
-        public bool IsRecalled { get; set; }
-    }
+
 
     public class App
     {
         static FluentCommandLineParser<ApplicationArguments> Args = new();
 
-        static void InitArgs()
-        {
-            Args.SetupHelp("?", "help")
-                .Callback(() => Console.WriteLine("ehh"));
-
-            Args.Setup(arg => arg.FromId)
-                .As('f', "fromid")
-                .Required();
-
-            Args.Setup(arg => arg.ToId)
-                .As('t', "toid")
-                .Required();
-
-            Args.Setup(arg => arg.NumThread)
-                .As('n', "numthread")
-                .Required();
-
-            Args.Setup(arg => arg.IsSaveApk)
-                .As('s', "save")
-                .SetDefault(true);
-
-            Args.Setup(arg => arg.IsRecalled)
-                .As('r', "recallled")
-                .SetDefault(true);
-        }
-
         static void EnumerateApp(Object AppID)
         {
             var id = (int)AppID;
+
+
         }
 
         public static int Main(string[] RawArgs)
         {
+            var argp=new CommandLineArgumentsProcessor();
+            argp.ProcessArgs();
+            Args = argp.Args;
+
             if (Args.Parse(RawArgs).HasErrors)
             {
                 return 1;
