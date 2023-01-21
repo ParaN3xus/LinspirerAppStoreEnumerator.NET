@@ -2,7 +2,9 @@
 using Fclp;
 using Newtonsoft.Json;
 using System;
+using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
+using System.Text;
 using System.Xml.Linq;
 using static LinspirerAppStoreEnumerator.NET.CmdArgsProcessor;
 using static System.Net.Mime.MediaTypeNames;
@@ -61,7 +63,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
                     Log.WriteLog(Log.LogLevel.Info, $"App {id} downloaded!");
                 });
-            var getinfo = new Task(() =>
+            var getinfo1 = new Task(() =>
             {
                 string packagename, targetapi, name, versionname, versioncode, md5sum, sha1;
 
@@ -96,9 +98,15 @@ namespace LinspirerAppStoreEnumerator.NET
                 catch (Exception ex)
                 {
                     Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with YoungToday solution faild with {ex.Message}");
-                    // solution2
-
+                    return;
                 }
+
+                using (StreamWriter sw = new StreamWriter("appinfo.csv", false, Encoding.GetEncoding("GB2312")))
+                {
+                    sw.WriteLine($"{id},{packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
+                }
+
+                Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info ok! {packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
             });
 
             Log.WriteLog(Log.LogLevel.Info, $"App {id} started.");
@@ -107,9 +115,6 @@ namespace LinspirerAppStoreEnumerator.NET
             {
                 download.Start();
             }
-
-
-
 
             download.Wait();
             //Log.WriteLog(Log.LogLevel.Error, $"App ID: {id} occurred error!");
@@ -133,6 +138,11 @@ namespace LinspirerAppStoreEnumerator.NET
             var pool = new SmartThreadPool();
 
             pool.MaxQueueLength=Args.Object.NumThread;
+
+            using (StreamWriter sw = new StreamWriter("appinfo.csv", false, Encoding.GetEncoding("GB2312")))
+            {
+                sw.WriteLine("ID,PackageName,TargetAPI,Name,VersionName,VersionCode,MD5,SHA1");
+            }
 
             for (var i = Args.Object.FromId; i <= Args.Object.ToId; i++)
             {
