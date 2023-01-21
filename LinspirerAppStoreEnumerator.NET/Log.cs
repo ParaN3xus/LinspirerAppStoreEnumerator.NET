@@ -9,12 +9,12 @@ namespace LinspirerAppStoreEnumerator.NET
 {
     public static class Log
     {
-        public enum LogLevel { Error, Info }
+        public enum LogLevel { Error, Warn ,Info }
 
         public static void WriteLog(LogLevel logLevel, string text)
         {
-            Colorful.Console.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss")}][{logLevel}]{(logLevel == LogLevel.Info ? " " : "")}: {text}"
-                , logLevel == LogLevel.Info ? Color.White : Color.Red);
+            Colorful.Console.WriteLine($"[{DateTime.Now.ToString("HH:mm:ss")}][{logLevel}]{(logLevel == LogLevel.Error ? "" : " ")}: {text}"
+                , logLevel == LogLevel.Info ? Color.White : logLevel == LogLevel.Warn? Color.Yellow: Color.Red);
         }
     }
 }

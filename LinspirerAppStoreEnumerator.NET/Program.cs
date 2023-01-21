@@ -15,13 +15,13 @@ namespace LinspirerAppStoreEnumerator.NET
 
         static object EnumerateApp(Object AppID)
         {
-            var id = 10093;//(int)AppID;
+            var id = (int)AppID;//(int)AppID;
             var download = new Task( () =>
                 {
                     var mac = "4a";
                     var email = "null";
                     var url = $"https://cloud.linspirer.com:883/download.php?email={email}&appid={id}&swdid={mac}&version={new Random(DateTime.Now.Millisecond).Next(1, 9000000)}";
-                    var save = @".\"+id.ToString()+".apk";
+                    var save = @"./apks/"+id.ToString()+".apk";
                     var http = new HttpClient();
                     var request = new HttpRequestMessage(HttpMethod.Get, url);
                     request.Headers.Add("Range", "bytes=0-0");
@@ -33,7 +33,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
                     if(response.StatusCode!=System.Net.HttpStatusCode.Redirect)
                     {
-                        Log.WriteLog(Log.LogLevel.Info, $"App {id} do not exist!");
+                        Log.WriteLog(Log.LogLevel.Warn, $"App {id} do not exist!");
                         return;
                     }
 
