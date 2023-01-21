@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace LinspirerAppStoreEnumerator.NET
 {
-    public class CommandLineArgumentsProcessor
+    public class CmdArgsProcessor
     {
         public FluentCommandLineParser<ApplicationArguments> Args;
 
-        public CommandLineArgumentsProcessor()
+        public CmdArgsProcessor()
         {
             Args = new();
         }

@@ -1,6 +1,6 @@
 ﻿using Fclp;
 using System;
-using static LinspirerAppStoreEnumerator.NET.CommandLineArgumentsProcessor;
+using static LinspirerAppStoreEnumerator.NET.CmdArgsProcessor;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace LinspirerAppStoreEnumerator.NET
@@ -20,7 +20,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
         public static int Main(string[] RawArgs)
         {
-            var argp=new CommandLineArgumentsProcessor();
+            var argp = new CmdArgsProcessor();
             argp.ProcessArgs();
             Args = argp.Args;
 
