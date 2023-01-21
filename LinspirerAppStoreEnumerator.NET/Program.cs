@@ -6,9 +6,9 @@ namespace LinspirerAppStoreEnumerator.NET
 {
     public class ApplicationArguments
     {
-        public int StartId { get; set; }
-        public int EndId { get; set; }
-        public int ThreadNum { get; set; }
+        public int FromId { get; set; }
+        public int ToId { get; set; }
+        public int NumThread { get; set; }
         public bool IsSaveApk { get; set; }
         public bool IsRecalled { get; set; }
     }
@@ -22,15 +22,15 @@ namespace LinspirerAppStoreEnumerator.NET
             p.SetupHelp("?", "help")
                 .Callback(()=>Console.WriteLine("ehh"));
 
-            p.Setup(arg => arg.StartId)
+            p.Setup(arg => arg.FromId)
                 .As('f', "fromid")
                 .Required();
 
-            p.Setup(arg => arg.StartId)
+            p.Setup(arg => arg.FromId)
                 .As('t', "toid")
                 .Required();
 
-            p.Setup(arg => arg.ThreadNum)
+            p.Setup(arg => arg.NumThread)
                 .As('n', "numthread")
                 .Required();
 
@@ -59,12 +59,13 @@ namespace LinspirerAppStoreEnumerator.NET
                 return 1;
             }
 
-            ThreadPool.SetMaxThreads(args.Object.ThreadNum, args.Object.ThreadNum);
+            ThreadPool.SetMaxThreads(args.Object.NumThread, args.Object.NumThread);
 
-            for (var i = args.Object.StartId; i <= args.Object.EndId; i++)
+            for (var i = args.Object.FromId; i <= args.Object.ToId; i++)
             {
                 ThreadPool.QueueUserWorkItem(EnumerateApp, i);
             }
+
 
             return 0;
         }
