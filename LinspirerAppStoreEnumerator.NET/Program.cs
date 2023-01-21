@@ -1,15 +1,11 @@
 ﻿using Amib.Threading;
 using Fclp;
 using Newtonsoft.Json;
-using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
-using System.Xml.Linq;
 using static LinspirerAppStoreEnumerator.NET.CmdArgsProcessor;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace LinspirerAppStoreEnumerator.NET
 {
@@ -119,11 +115,19 @@ namespace LinspirerAppStoreEnumerator.NET
 
                 Process process = new();
                 process.StartInfo.FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "aapt2-linux" : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "aapt2-win.exe" : "aapt2-osx";
-                process.StartInfo.Arguments = $"dump badging {Directory.GetCurrentDirectory()}{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/")}apks{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/")}{id}.apk >> {id}.txt";
-                process.StartInfo.CreateNoWindow = true;
+                process.StartInfo.Arguments = $"dump badging ./apks/{id}.apk";
+                process.StartInfo.CreateNoWindow = false;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.StandardOutputEncoding= Encoding.UTF8;
                 process.Start();
+
+                List<string> lines = new();
+                var sr = process.StandardOutput;
+                while (!sr.EndOfStream)
+                {
+                    lines.Add(sr.ReadLine());
+                }
                 process.WaitForExit();
-                process.Close();
 
                 Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info with aapt2 solution...");
 
@@ -133,7 +137,7 @@ namespace LinspirerAppStoreEnumerator.NET
                     return;
                 }
 
-                foreach (string line in File.ReadAllLines($"{id}.txt"))
+                foreach (string line in lines)
                 {
                     if (line.StartsWith(@"package: name='"))
                     {
@@ -160,8 +164,8 @@ namespace LinspirerAppStoreEnumerator.NET
                     {
                         using (var stream = File.OpenRead($"./apks/{id}.apk"))
                         {
-                            md5sum = Encoding.Default.GetString(md5.ComputeHash(stream));
-                            sha1 = Encoding.Default.GetString(hash.ComputeHash(stream));
+                            md5sum = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "");
+                            sha1 = BitConverter.ToString(hash.ComputeHash(stream)).Replace("-","");
                         }
                     }
                 }
