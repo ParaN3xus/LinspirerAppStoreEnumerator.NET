@@ -132,7 +132,7 @@ namespace LinspirerAppStoreEnumerator.NET
             var argp = new CmdArgsProcessor();
             argp.ProcessArgs();
             Args = argp.Args;
-            
+
 
             if (Args.Parse(RawArgs).HasErrors)
             {
@@ -141,7 +141,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
             var pool = new SmartThreadPool();
 
-            pool.MaxQueueLength=Args.Object.NumThread;
+            pool.MaxQueueLength = Args.Object.NumThread;
 
             if (!Directory.Exists("./apks"))
             {
@@ -156,7 +156,7 @@ namespace LinspirerAppStoreEnumerator.NET
             {
                 pool.QueueWorkItem(callback: EnumerateApp, state: i);
             }
-                
+
             pool.WaitForIdle();
 
             return 0;
