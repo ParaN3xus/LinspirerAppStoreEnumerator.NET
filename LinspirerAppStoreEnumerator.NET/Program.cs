@@ -12,7 +12,7 @@ namespace LinspirerAppStoreEnumerator.NET
     public class App
     {
         static FluentCommandLineParser<ApplicationArguments> Args = new();
-
+        static ReaderWriterLockSlim LogWriteLock = new ReaderWriterLockSlim();
         static object EnumerateApp(Object AppID)
         {
             var getinfosuccess = false;
@@ -104,16 +104,24 @@ namespace LinspirerAppStoreEnumerator.NET
                     return;
                 }
 
+                LogWriteLock.EnterWriteLock();
                 using (StreamWriter sw = new StreamWriter("appinfo.csv", true, Encoding.UTF8))
                 {
                     sw.WriteLine($"{id},{packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
                 }
+                LogWriteLock.ExitWriteLock();
 
                 getinfosuccess = true;
                 Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info success! {packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
             });
             var getinfo2 = new Task(() =>
             {
+                if (!File.Exists($"apks/{id}.apk"))
+                {
+                    Log.WriteLog(Log.LogLevel.Info, $"App {id} do not exist.");
+                    return;
+                }
+
                 string packagename = "", targetapi = "", name = "", versionname = "", versioncode = "", md5sum = "", sha1 = "";
 
                 Process process = new();
@@ -124,73 +132,81 @@ namespace LinspirerAppStoreEnumerator.NET
                 process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
 
                 Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info with aapt2 solution...");
-
-                process.Start();
-
-                List<string> lines = new();
-                var sr = process.StandardOutput;
-
-                if (sr == null)
+                try
                 {
-                    Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with aapt2 solution faild with no output!");
-                    return;
-                }
+                    process.Start();
 
-                while (!sr.EndOfStream)
-                {
-                    var text = sr.ReadLine();
-                    if (text != null)
+                    List<string> lines = new();
+                    var sr = process.StandardOutput;
+
+                    if (sr == null)
                     {
-                        lines.Add(text);
+                        Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with aapt2 solution faild with no output!");
+                        return;
                     }
-                }
 
-                process.WaitForExit();
-
-                if (!File.Exists($"./apks/{id}.apk"))
-                {
-                    Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with aapt2 solution faild with no apk file!");
-                    return;
-                }
-
-                foreach (string line in lines)
-                {
-                    if (line.StartsWith(@"package: name='"))
+                    while (!sr.EndOfStream)
                     {
-                        var list = line.Split('\'');
-                        packagename = list[1];
-                        versioncode = list[3];
-                        versionname = list[5];
-                    }
-                    else if (line.StartsWith(@"targetSdkVersion:'"))
-                    {
-                        var list = line.Split('\'');
-                        targetapi = list[1];
-                    }
-                    else if (line.StartsWith(@"application-label:'"))
-                    {
-                        var list = line.Split('\'');
-                        name = list[1];
-                    }
-                }
-
-                using (var md5 = MD5.Create())
-                {
-                    using (var hash = SHA1.Create())
-                    {
-                        using (var stream = File.OpenRead($"./apks/{id}.apk"))
+                        var text = sr.ReadLine();
+                        if (text != null)
                         {
-                            md5sum = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "");
-                            sha1 = BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "");
+                            lines.Add(text);
                         }
                     }
-                }
 
-                Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info success! {packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
-                
-                using (StreamWriter sw = new StreamWriter("appinfo.csv", true, Encoding.UTF8))
+                    process.WaitForExit();
+
+                    if (!File.Exists($"./apks/{id}.apk"))
+                    {
+                        Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with aapt2 solution faild with no apk file!");
+                        return;
+                    }
+
+                    foreach (string line in lines)
+                    {
+                        if (line.StartsWith(@"package: name='"))
+                        {
+                            var list = line.Split('\'');
+                            packagename = list[1];
+                            versioncode = list[3];
+                            versionname = list[5];
+                        }
+                        else if (line.StartsWith(@"targetSdkVersion:'"))
+                        {
+                            var list = line.Split('\'');
+                            targetapi = list[1];
+                        }
+                        else if (line.StartsWith(@"application-label:'"))
+                        {
+                            var list = line.Split('\'');
+                            name = list[1];
+                        }
+                    }
+
+                    using (var md5 = MD5.Create())
+                    {
+                        using (var hash = SHA1.Create())
+                        {
+                            using (var stream = File.OpenRead($"./apks/{id}.apk"))
+                            {
+                                md5sum = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "");
+                                sha1 = BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "");
+                            }
+                        }
+                    }
+
+                    Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info success! {packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
+
+                    LogWriteLock.EnterWriteLock();
+                    using (StreamWriter sw = new StreamWriter("appinfo.csv", true, Encoding.UTF8))
+                    {
+                        sw.WriteLine($"{id},{packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
+                    }
+                    LogWriteLock.ExitWriteLock();
+                }
+                catch (Exception ex)
                 {
-                    sw.WriteLine($"{id},{packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
+                    Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with aapt2 solution faild with {ex.Message}");
                 }
             });
 
@@ -200,6 +216,7 @@ namespace LinspirerAppStoreEnumerator.NET
             {
                 download.Start();
             }
+
             getinfo1.Start();
             getinfo1.Wait();
 
@@ -207,13 +224,30 @@ namespace LinspirerAppStoreEnumerator.NET
             {
                 if (Args.Object.IsSaveApk)
                 {
-                    download.Wait();
+                    if (!download.IsCompleted)
+                    {
+                        download.Wait();
+                    }
+                    else
+                    {
+                        getinfo2.Start();
+                    }
                 }
-                getinfo2.Start();
+                else
+                {
+                    download.Start();
+                    download.Wait();
+                    getinfo2.Start();
+                }
+
                 getinfo2.Wait();
             }
 
-            download.Wait();
+            if (Args.Object.IsSaveApk && !download.IsCompleted)
+            {
+                download.Wait();
+            }
+
             Log.WriteLog(Log.LogLevel.Info, $"App ID: {id} done.");
             return 0;
         }
