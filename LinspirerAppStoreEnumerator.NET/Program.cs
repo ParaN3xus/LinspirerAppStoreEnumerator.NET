@@ -70,7 +70,7 @@ namespace LinspirerAppStoreEnumerator.NET
                 var mac = "4a";
                 var username = "sxceshi1";
                 var client = new HttpClient();
-                var json = $"{{\"is_encrypt\": false, \"method\": \"com.linspirer.app.getappbyids\", \"id\": \"1\", \"!version\": \"1\", \"jsonrpc\": \"2.0\", \"params\": {{\"swdid\": {mac}, \"username\": {username}, \"token\": \"null\", \"ids\": [\"<built-in function id>\"]}, \"client_version\": \"5.1.0\", \"_elapsed\": 1}";
+                var json = $"{{\"is_encrypt\": false, \"method\": \"com.linspirer.app.getappbyids\", \"id\": \"1\", \"!version\": \"1\", \"jsonrpc\": \"2.0\", \"params\": {{\"swdid\": {mac}, \"username\": {username}, \"token\": \"null\", \"ids\": [\"<built-in function id>\"]}}, \"client_version\": \"5.1.0\", \"_elapsed\": 1}}";
                 var content = new StringContent(json);
 
                 Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info with YoungToday solution...");
