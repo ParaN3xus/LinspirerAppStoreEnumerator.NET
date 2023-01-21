@@ -15,7 +15,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
     public class App
     {
-        public FluentCommandLineParser<ApplicationArguments> InitArgs()
+        static FluentCommandLineParser<ApplicationArguments> InitArgs()
         {
             var p = new FluentCommandLineParser<ApplicationArguments>();
 
@@ -45,7 +45,12 @@ namespace LinspirerAppStoreEnumerator.NET
             return p;
         }
 
-        public int Main(string[] RawArgs)
+        static void EnumerateApp(Object stateInfo)
+        {
+            Console.WriteLine((int)stateInfo);
+        }
+
+        public static int Main(string[] RawArgs)
         {
             var args = InitArgs();
 
@@ -54,6 +59,12 @@ namespace LinspirerAppStoreEnumerator.NET
                 return 1;
             }
 
+            ThreadPool.SetMaxThreads(args.Object.ThreadNum, args.Object.ThreadNum);
+
+            for (var i = args.Object.StartId; i <= args.Object.EndId; i++)
+            {
+                ThreadPool.QueueUserWorkItem(EnumerateApp, i);
+            }
 
             return 0;
         }
