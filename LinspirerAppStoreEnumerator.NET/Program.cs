@@ -126,9 +126,17 @@ namespace LinspirerAppStoreEnumerator.NET
 
                 List<string> lines = new();
                 var sr = process.StandardOutput;
-                while (!sr.EndOfStream)
+
+                if (sr != null)
                 {
-                    lines.Add(sr.ReadLine());
+                    while (!sr.EndOfStream)
+                    {
+                        var text = sr.ReadLine();
+                        if (text != null)
+                        {
+                            lines.Add(text);
+                        }
+                    }
                 }
                 process.WaitForExit();
 
