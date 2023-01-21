@@ -15,7 +15,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
     public class App
     {
-        public FluentCommandLineParser<ApplicationArguments> CommandLineArgsProcess(string[] args)
+        public FluentCommandLineParser<ApplicationArguments> InitArgs()
         {
             var p = new FluentCommandLineParser<ApplicationArguments>();
 
@@ -42,19 +42,22 @@ namespace LinspirerAppStoreEnumerator.NET
                 .As('r', "recallled")
                 .SetDefault(true);
 
-            p.Parse(args);
-
             return p;
         }
 
         public int Main(string[] RawArgs)
         {
-            var args = CommandLineArgsProcess(RawArgs);
+            var args = InitArgs();
+
+            if(args.Parse(RawArgs).HasErrors)
+            {
+                return 1;
+            }
 
 
             return 0;
         }
-    }
+    } 
 
 
 
