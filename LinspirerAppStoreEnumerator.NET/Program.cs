@@ -15,66 +15,61 @@ namespace LinspirerAppStoreEnumerator.NET
 
     public class App
     {
-        static FluentCommandLineParser<ApplicationArguments> InitArgs()
+        static FluentCommandLineParser<ApplicationArguments> Args = new();
+
+        static void InitArgs()
         {
-            var p = new FluentCommandLineParser<ApplicationArguments>();
+            Args.SetupHelp("?", "help")
+                .Callback(() => Console.WriteLine("ehh"));
 
-            p.SetupHelp("?", "help")
-                .Callback(()=>Console.WriteLine("ehh"));
-
-            p.Setup(arg => arg.FromId)
+            Args.Setup(arg => arg.FromId)
                 .As('f', "fromid")
                 .Required();
 
-            p.Setup(arg => arg.ToId)
+            Args.Setup(arg => arg.ToId)
                 .As('t', "toid")
                 .Required();
 
-            p.Setup(arg => arg.NumThread)
+            Args.Setup(arg => arg.NumThread)
                 .As('n', "numthread")
                 .Required();
 
-            p.Setup(arg => arg.IsSaveApk)
+            Args.Setup(arg => arg.IsSaveApk)
                 .As('s', "save")
                 .SetDefault(true);
 
-            p.Setup(arg => arg.IsRecalled)
+            Args.Setup(arg => arg.IsRecalled)
                 .As('r', "recallled")
                 .SetDefault(true);
-
-            return p;
         }
 
-        static void EnumerateApp(Object stateInfo)
+        static void EnumerateApp(Object AppID)
         {
-            Console.WriteLine((int)stateInfo);
+            var id = (int)AppID;
         }
 
         public static int Main(string[] RawArgs)
         {
-            var args = InitArgs();
-
-            if(args.Parse(RawArgs).HasErrors)
+            if (Args.Parse(RawArgs).HasErrors)
             {
                 return 1;
             }
 
-            ThreadPool.SetMaxThreads(args.Object.NumThread, args.Object.NumThread);
+            ThreadPool.SetMaxThreads(Args.Object.NumThread, Args.Object.NumThread);
 
-            for (var i = args.Object.FromId; i <= args.Object.ToId; i++)
+            for (var i = Args.Object.FromId; i <= Args.Object.ToId; i++)
             {
                 ThreadPool.QueueUserWorkItem(EnumerateApp, i);
             }
 
-            while (ThreadPool.CompletedWorkItemCount < args.Object.ToId-args.Object.FromId+1)
+            while (ThreadPool.CompletedWorkItemCount < Args.Object.ToId - Args.Object.FromId + 1)
             {
                 Thread.Sleep(100);
             }
 
             return 0;
         }
-    } 
-
+    }
 
 
 }
