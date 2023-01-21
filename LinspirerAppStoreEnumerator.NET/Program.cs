@@ -31,7 +31,7 @@ namespace LinspirerAppStoreEnumerator.NET
                 .Required();
 
             p.Setup(arg => arg.ThreadNum)
-                .As('t', "thread")
+                .As('n', "numthread")
                 .Required();
 
             p.Setup(arg => arg.IsSaveApk)
