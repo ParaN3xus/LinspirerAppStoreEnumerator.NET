@@ -33,11 +33,11 @@ namespace LinspirerAppStoreEnumerator.NET
 
             Args.Setup(arg => arg.IsSaveApk)
                 .As('s', "save")
-                .Required();
+                .SetDefault(false);
 
             Args.Setup(arg => arg.IsRecalled)
                 .As('r', "recallled")
-                .Required();
+                .SetDefault(false);
 
             Args.SetupHelp("?", "help")
                   .Callback(text =>
