@@ -1,0 +1,56 @@
+name: Emumerate
+
+on:
+  workflow_dispatch:
+    inputs:
+      Start:
+        description: 'From ID'
+        required: true
+        default: '10000'
+      End:
+        description: 'To ID'
+        required: true
+        default: '10050'
+      Threads:
+        description: 'Thread Num'
+        required: true
+        default: '4'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Initialize .NET Environment
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.x'
+
+      - name: Initialize Java Environment
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+          
+      - name: Build the project
+        run: |
+          dotnet build -c Release
+          cp LinspirerAppStoreEnumerator.NET/binary/* LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/
+
+      - name: Run
+        run: |
+          cd LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/
+          dotnet LinspirerAppStoreEnumerator.NET.dll -f ${{ github.event.inputs.Start }} -t ${{ github.event.inputs.End }} -n ${{ github.event.inputs.Threads }} -r
+
+      - name: move appinfo.csv
+        run: |
+          md result
+          move ./LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/appinfo.csv ./result/appinfo.csv
+          
+      - name: Upload appinfo.csv
+        uses: actions/upload-artifact@v2
+        with:
+          name: result
+          path: result/
