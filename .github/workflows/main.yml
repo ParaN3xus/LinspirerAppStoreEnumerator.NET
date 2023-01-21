@@ -40,7 +40,9 @@ jobs:
           cp LinspirerAppStoreEnumerator.NET/binary/* LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/
 
       - name: Run
-        run: dotnet LinspirerAppStoreEnumerator.NET.dll -f ${{ github.event.inputs.Start }} -t ${{ github.event.inputs.End }} -n ${{ github.event.inputs.Threads }} -r
+        run: |
+          cd LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/
+          dotnet LinspirerAppStoreEnumerator.NET.dll -f ${{ github.event.inputs.Start }} -t ${{ github.event.inputs.End }} -n ${{ github.event.inputs.Threads }} -r
 
       - name: move appinfo.csv
         run: |
