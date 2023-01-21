@@ -18,9 +18,6 @@ namespace LinspirerAppStoreEnumerator.NET
 
         public void ProcessArgs()
         {
-            Args.SetupHelp("?", "help")
-                .Callback(() => Console.WriteLine("ehh"));
-
             Args.Setup(arg => arg.FromId)
                 .As('f', "fromid")
                 .Required();
@@ -40,6 +37,9 @@ namespace LinspirerAppStoreEnumerator.NET
             Args.Setup(arg => arg.IsRecalled)
                 .As('r', "recallled")
                 .SetDefault(true);
+
+            Args.SetupHelp("?", "help")
+                  .Callback(text => Console.WriteLine(text));
         }
 
         public class ApplicationArguments
