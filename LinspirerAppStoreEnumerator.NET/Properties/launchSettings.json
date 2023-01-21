@@ -1,8 +1,7 @@
 {
   "profiles": {
     "LinspirerAppStoreEnumerator.NET": {
-      "commandName": "Project",
-      "commandLineArgs": "-?"
+      "commandName": "Project"
     }
   }
 }

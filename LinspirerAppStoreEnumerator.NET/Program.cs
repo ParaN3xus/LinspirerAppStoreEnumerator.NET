@@ -9,8 +9,6 @@ using static LinspirerAppStoreEnumerator.NET.CmdArgsProcessor;
 
 namespace LinspirerAppStoreEnumerator.NET
 {
-
-
     public class App
     {
         static FluentCommandLineParser<ApplicationArguments> Args = new();
@@ -79,6 +77,11 @@ namespace LinspirerAppStoreEnumerator.NET
 
                 try
                 {
+                    if (data == null)
+                    {
+                        Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with YoungToday solution faild with blank response!");
+                        return;
+                    }
                     var datab = data.data;
 
                     if (data.code != 0)
@@ -118,7 +121,7 @@ namespace LinspirerAppStoreEnumerator.NET
                 process.StartInfo.Arguments = $"dump badging ./apks/{id}.apk";
                 process.StartInfo.CreateNoWindow = false;
                 process.StartInfo.RedirectStandardOutput = true;
-                process.StartInfo.StandardOutputEncoding= Encoding.UTF8;
+                process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
                 process.Start();
 
                 List<string> lines = new();
@@ -131,7 +134,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
                 Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info with aapt2 solution...");
 
-                if(!File.Exists($"./apks/{id}.apk"))
+                if (!File.Exists($"./apks/{id}.apk"))
                 {
                     Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with aapt2 solution faild with no apk file!");
                     return;
@@ -165,7 +168,7 @@ namespace LinspirerAppStoreEnumerator.NET
                         using (var stream = File.OpenRead($"./apks/{id}.apk"))
                         {
                             md5sum = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "");
-                            sha1 = BitConverter.ToString(hash.ComputeHash(stream)).Replace("-","");
+                            sha1 = BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "");
                         }
                     }
                 }
@@ -185,9 +188,9 @@ namespace LinspirerAppStoreEnumerator.NET
             getinfo1.Start();
             getinfo1.Wait();
 
-            if(!getinfosuccess && Args.Object.IsRecalled) 
+            if (!getinfosuccess && Args.Object.IsRecalled)
             {
-                if(Args.Object.IsSaveApk)
+                if (Args.Object.IsSaveApk)
                 {
                     download.Wait();
                 }
@@ -206,9 +209,9 @@ namespace LinspirerAppStoreEnumerator.NET
             argp.ProcessArgs();
             Args = argp.Args;
 
-
             if (Args.Parse(RawArgs).HasErrors)
             {
+                Console.WriteLine("Wrong arguments. Run again with -? for help.");
                 return 1;
             }
 

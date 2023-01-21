@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace LinspirerAppStoreEnumerator.NET
 {
@@ -32,14 +33,22 @@ namespace LinspirerAppStoreEnumerator.NET
 
             Args.Setup(arg => arg.IsSaveApk)
                 .As('s', "save")
-                .SetDefault(true);
+                .Required();
 
             Args.Setup(arg => arg.IsRecalled)
                 .As('r', "recallled")
-                .SetDefault(true);
+                .Required();
 
             Args.SetupHelp("?", "help")
-                  .Callback(text => Console.WriteLine(text));
+                  .Callback(text =>
+                  {
+                      Console.Write(
+                          "LinspirerAppStoreEnumerator is a tool to download and get info of apps on Linspirer App Store\n\n" +
+                          "Usage: LinspirerAppStoreEnumerator [-option] [value] [-booloptions] ...\n\n" +
+                          "Available options and its shortname:");
+                      Console.WriteLine(text);
+                      System.Environment.Exit(0);
+                  });
         }
 
         public class ApplicationArguments
