@@ -23,11 +23,11 @@ namespace LinspirerAppStoreEnumerator.NET
                 .Callback(()=>Console.WriteLine("ehh"));
 
             p.Setup(arg => arg.StartId)
-                .As('s', "startid")
+                .As('f', "fromid")
                 .Required();
 
             p.Setup(arg => arg.StartId)
-                .As('e', "endid")
+                .As('t', "toid")
                 .Required();
 
             p.Setup(arg => arg.ThreadNum)
