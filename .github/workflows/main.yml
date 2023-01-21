@@ -46,7 +46,7 @@ jobs:
 
       - name: move appinfo.csv
         run: |
-          md result
+          mkdir result
           move ./LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/appinfo.csv ./result/appinfo.csv
           
       - name: Upload appinfo.csv
