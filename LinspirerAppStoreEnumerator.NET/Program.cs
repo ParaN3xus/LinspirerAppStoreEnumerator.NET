@@ -2,6 +2,8 @@
 using Fclp;
 using Newtonsoft.Json;
 using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics.Arm;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,6 +21,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
         static object EnumerateApp(Object AppID)
         {
+            var getinfosuccess = false;
             var id = (int)AppID;
             var download = new Task(() =>
                 {
@@ -65,7 +68,7 @@ namespace LinspirerAppStoreEnumerator.NET
                 });
             var getinfo1 = new Task(() =>
             {
-                string packagename, targetapi, name, versionname, versioncode, md5sum, sha1;
+                string packagename = "", targetapi = "", name = "", versionname = "", versioncode = "", md5sum = "", sha1 = "";
 
                 var mac = "b4:cd:27:30:3e:f2";
                 var username = "sxceshi1";
@@ -107,7 +110,66 @@ namespace LinspirerAppStoreEnumerator.NET
                     sw.WriteLine($"{id},{packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
                 }
 
+                getinfosuccess = true;
                 Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info success! {packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
+            });
+            var getinfo2 = new Task(() =>
+            {
+                string packagename = "", targetapi = "", name = "", versionname = "", versioncode = "", md5sum = "", sha1 = "";
+
+                Process process = new();
+                process.StartInfo.FileName = RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? "aapt2-linux" : RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "aapt2-win.exe" : "aapt2-osx";
+                process.StartInfo.Arguments = $"dump badging {Directory.GetCurrentDirectory()}{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/")}apks{(RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "\\" : "/")}{id}.apk >> {id}.txt";
+                process.StartInfo.CreateNoWindow = true;
+                process.Start();
+                process.WaitForExit();
+                process.Close();
+
+                Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info with aapt2 solution...");
+
+                if(!File.Exists($"./apks/{id}.apk"))
+                {
+                    Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with aapt2 solution faild with no apk file!");
+                    return;
+                }
+
+                foreach (string line in File.ReadAllLines($"{id}.txt"))
+                {
+                    if (line.StartsWith(@"package: name='"))
+                    {
+                        var list = line.Split('\'');
+                        packagename = list[1];
+                        versioncode = list[3];
+                        versionname = list[5];
+                    }
+                    else if (line.StartsWith(@"targetSdkVersion:'"))
+                    {
+                        var list = line.Split('\'');
+                        targetapi = list[1];
+                    }
+                    else if (line.StartsWith(@"application-label:'"))
+                    {
+                        var list = line.Split('\'');
+                        name = list[1];
+                    }
+                }
+
+                using (var md5 = MD5.Create())
+                {
+                    using (var hash = SHA1.Create())
+                    {
+                        using (var stream = File.OpenRead($"./apks/{id}.apk"))
+                        {
+                            md5sum = Encoding.Default.GetString(md5.ComputeHash(stream));
+                            sha1 = Encoding.Default.GetString(hash.ComputeHash(stream));
+                        }
+                    }
+                }
+
+                using (StreamWriter sw = new StreamWriter("appinfo.csv", true, Encoding.UTF8))
+                {
+                    sw.WriteLine($"{id},{packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
+                }
             });
 
             Log.WriteLog(Log.LogLevel.Info, $"App {id} started.");
@@ -117,12 +179,19 @@ namespace LinspirerAppStoreEnumerator.NET
                 download.Start();
             }
             getinfo1.Start();
-
-
             getinfo1.Wait();
-            download.Wait();
-            //Log.WriteLog(Log.LogLevel.Error, $"App ID: {id} occurred error!");
 
+            if(!getinfosuccess && Args.Object.IsRecalled) 
+            {
+                if(Args.Object.IsSaveApk)
+                {
+                    download.Wait();
+                }
+                getinfo2.Start();
+                getinfo2.Wait();
+            }
+
+            download.Wait();
             Log.WriteLog(Log.LogLevel.Info, $"App ID: {id} done.");
             return 0;
         }
