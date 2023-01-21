@@ -44,10 +44,10 @@ jobs:
           cd LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/
           dotnet LinspirerAppStoreEnumerator.NET.dll -f ${{ github.event.inputs.Start }} -t ${{ github.event.inputs.End }} -n ${{ github.event.inputs.Threads }} -r
 
-      - name: move appinfo.csv
+      - name: Move appinfo.csv
         run: |
           mkdir result
-          move ./LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/appinfo.csv ./result/appinfo.csv
+          mv ./LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/appinfo.csv ./result/appinfo.csv
           
       - name: Upload appinfo.csv
         uses: actions/upload-artifact@v2
