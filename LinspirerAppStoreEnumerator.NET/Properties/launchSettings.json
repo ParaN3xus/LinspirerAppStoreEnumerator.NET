@@ -2,7 +2,7 @@
   "profiles": {
     "LinspirerAppStoreEnumerator.NET": {
       "commandName": "Project",
-      "commandLineArgs": "-f 10048 -t 10050 -n 4 -r\r\n"
+      "commandLineArgs": "-f 10041 -t 10041 -n 4 -r\r\n"
     }
   }
 }

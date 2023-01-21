@@ -190,7 +190,7 @@ namespace LinspirerAppStoreEnumerator.NET
                             using (var stream = File.OpenRead($"./apks/{id}.apk"))
                             {
                                 md5sum = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", "");
-                                sha1 = BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", "");
+                                sha1 = BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", ":");
                             }
                         }
                     }
