@@ -19,7 +19,7 @@ namespace LinspirerAppStoreEnumerator.NET
 
         static object EnumerateApp(Object AppID)
         {
-            var id = (int)AppID;//(int)AppID;
+            var id = (int)AppID;
             var download = new Task(() =>
                 {
                     var mac = "4a";
@@ -67,10 +67,10 @@ namespace LinspirerAppStoreEnumerator.NET
             {
                 string packagename, targetapi, name, versionname, versioncode, md5sum, sha1;
 
-                var mac = "4a";
+                var mac = "b4:cd:27:30:3e:f2";
                 var username = "sxceshi1";
                 var client = new HttpClient();
-                var json = $"{{\"is_encrypt\": false, \"method\": \"com.linspirer.app.getappbyids\", \"id\": \"1\", \"!version\": \"1\", \"jsonrpc\": \"2.0\", \"params\": {{\"swdid\": {mac}, \"username\": {username}, \"token\": \"null\", \"ids\": [\"<built-in function id>\"]}}, \"client_version\": \"5.1.0\", \"_elapsed\": 1}}";
+                var json = $"{{\"is_encrypt\": false, \"method\": \"com.linspirer.app.getappbyids\", \"id\": \"1\", \"!version\": \"1\", \"jsonrpc\": \"2.0\", \"params\": {{\"swdid\": \"{mac}\", \"username\": \"{username}\", \"token\": \"null\", \"ids\": [\"{id}\"]}}, \"client_version\": \"5.1.0\", \"_elapsed\": 1}}";
                 var content = new StringContent(json);
 
                 Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info with YoungToday solution...");
@@ -85,6 +85,7 @@ namespace LinspirerAppStoreEnumerator.NET
                     if (data.code != 0)
                     {
                         Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with YoungToday solution faild with invalid accound or swdid!");
+                        return;
                     }
 
                     packagename = datab[0].packagename;
@@ -101,12 +102,12 @@ namespace LinspirerAppStoreEnumerator.NET
                     return;
                 }
 
-                using (StreamWriter sw = new StreamWriter("appinfo.csv", false, Encoding.GetEncoding("GB2312")))
+                using (StreamWriter sw = new StreamWriter("appinfo.csv", true, Encoding.UTF8))
                 {
                     sw.WriteLine($"{id},{packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
                 }
 
-                Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info ok! {packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
+                Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info success! {packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
             });
 
             Log.WriteLog(Log.LogLevel.Info, $"App {id} started.");
@@ -115,7 +116,10 @@ namespace LinspirerAppStoreEnumerator.NET
             {
                 download.Start();
             }
+            getinfo1.Start();
 
+
+            getinfo1.Wait();
             download.Wait();
             //Log.WriteLog(Log.LogLevel.Error, $"App ID: {id} occurred error!");
 
@@ -139,7 +143,11 @@ namespace LinspirerAppStoreEnumerator.NET
 
             pool.MaxQueueLength=Args.Object.NumThread;
 
-            using (StreamWriter sw = new StreamWriter("appinfo.csv", false, Encoding.GetEncoding("GB2312")))
+            if (!Directory.Exists("./apks"))
+            {
+                Directory.CreateDirectory("./apks");
+            }
+            using (StreamWriter sw = new StreamWriter("appinfo.csv", false, Encoding.UTF8))
             {
                 sw.WriteLine("ID,PackageName,TargetAPI,Name,VersionName,VersionCode,MD5,SHA1");
             }
