@@ -26,7 +26,7 @@ namespace LinspirerAppStoreEnumerator.NET
                 .As('f', "fromid")
                 .Required();
 
-            p.Setup(arg => arg.FromId)
+            p.Setup(arg => arg.ToId)
                 .As('t', "toid")
                 .Required();
 
@@ -66,6 +66,10 @@ namespace LinspirerAppStoreEnumerator.NET
                 ThreadPool.QueueUserWorkItem(EnumerateApp, i);
             }
 
+            while (ThreadPool.CompletedWorkItemCount < args.Object.ToId-args.Object.FromId+1)
+            {
+                Thread.Sleep(100);
+            }
 
             return 0;
         }
