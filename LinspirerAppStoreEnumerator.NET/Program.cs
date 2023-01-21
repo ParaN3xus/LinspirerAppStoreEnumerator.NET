@@ -122,25 +122,30 @@ namespace LinspirerAppStoreEnumerator.NET
                 process.StartInfo.CreateNoWindow = false;
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+
+                Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info with aapt2 solution...");
+
                 process.Start();
 
                 List<string> lines = new();
                 var sr = process.StandardOutput;
 
-                if (sr != null)
+                if (sr == null)
                 {
-                    while (!sr.EndOfStream)
+                    Log.WriteLog(Log.LogLevel.Warn, $"App {id} getting info with aapt2 solution faild with no output!");
+                    return;
+                }
+
+                while (!sr.EndOfStream)
+                {
+                    var text = sr.ReadLine();
+                    if (text != null)
                     {
-                        var text = sr.ReadLine();
-                        if (text != null)
-                        {
-                            lines.Add(text);
-                        }
+                        lines.Add(text);
                     }
                 }
-                process.WaitForExit();
 
-                Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info with aapt2 solution...");
+                process.WaitForExit();
 
                 if (!File.Exists($"./apks/{id}.apk"))
                 {
@@ -181,6 +186,8 @@ namespace LinspirerAppStoreEnumerator.NET
                     }
                 }
 
+                Log.WriteLog(Log.LogLevel.Info, $"App {id} getting info success! {packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
+                
                 using (StreamWriter sw = new StreamWriter("appinfo.csv", true, Encoding.UTF8))
                 {
                     sw.WriteLine($"{id},{packagename},{targetapi},{name},{versionname},{versioncode},{md5sum},{sha1}");
@@ -242,6 +249,8 @@ namespace LinspirerAppStoreEnumerator.NET
             }
 
             pool.WaitForIdle();
+
+            Log.WriteLog(Log.LogLevel.Info, $"Done!");
 
             return 0;
         }
