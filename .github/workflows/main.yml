@@ -17,7 +17,7 @@ on:
         default: '4'
 
 jobs:
-  build:
+  Run:
     runs-on: ubuntu-latest
 
     steps:
@@ -50,7 +50,7 @@ jobs:
           mv ./LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/appinfo.csv ./result/appinfo.csv
           
       - name: Upload appinfo.csv
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: result
           path: result/
