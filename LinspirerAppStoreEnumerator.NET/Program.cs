@@ -251,6 +251,8 @@ namespace LinspirerAppStoreEnumerator.NET
                 // wait until analyze complete
                 getinfo2.Wait();
 
+                // delete the apk file if no one want it
+                File.Delete(@"./apks/" + id.ToString() + ".apk");
 
             }
 
