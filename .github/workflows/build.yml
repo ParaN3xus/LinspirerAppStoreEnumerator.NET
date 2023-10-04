@@ -18,7 +18,7 @@ jobs:
       - name: Build the project
         run: |
           dotnet build -c Release
-          cp LinspirerAppStoreEnumerator.NET/binary/* LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/
+          cp LinspirerAppStoreEnumerator.NET/binary/aapt2-linux LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/
 
       - name: Upload build
         uses: actions/upload-artifact@v3
@@ -39,7 +39,7 @@ jobs:
       - name: Build the project
         run: |
           dotnet build -c Release
-          copy LinspirerAppStoreEnumerator.NET\binary\* LinspirerAppStoreEnumerator.NET\bin\Release\net6.0\
+          copy LinspirerAppStoreEnumerator.NET\binary\aapt2-win.exe LinspirerAppStoreEnumerator.NET\bin\Release\net6.0\
 
       - name: Upload build
         uses: actions/upload-artifact@v3
