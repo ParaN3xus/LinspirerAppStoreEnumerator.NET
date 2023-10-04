@@ -44,7 +44,7 @@ jobs:
       - name: Upload build
         uses: actions/upload-artifact@v3
         with:
-          name: build_linux_amd64
+          name: build_win_amd64
           path: LinspirerAppStoreEnumerator.NET\bin\Release\net6.0\
 
 
