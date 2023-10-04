@@ -222,25 +222,36 @@ namespace LinspirerAppStoreEnumerator.NET
 
             if (!getinfosuccess && Args.Object.IsRecalled)
             {
+                // if download started
                 if (Args.Object.IsSaveApk)
                 {
-                    if (!download.IsCompleted)
+                    // if download complete
+                    if (download.IsCompleted)
                     {
-                        download.Wait();
+                        // begin analyze
+                        getinfo2.Start();
                     }
+                    // if not complete
                     else
                     {
+                        // wait until it complete
+                        download.Wait();
+                        // and then begin analyze
                         getinfo2.Start();
                     }
                 }
+                // if download not started
                 else
                 {
+                    // start download and begin analyze once it was done
                     download.Start();
                     download.Wait();
                     getinfo2.Start();
                 }
-
+                // wait until analyze complete
                 getinfo2.Wait();
+
+
             }
 
             if (Args.Object.IsSaveApk && !download.IsCompleted)
