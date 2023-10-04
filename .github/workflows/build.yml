@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Run:
+  linux_amd64:
     runs-on: ubuntu-latest
 
     steps:
@@ -23,5 +23,28 @@ jobs:
       - name: Upload build
         uses: actions/upload-artifact@v3
         with:
-          name: build
+          name: build_linux_amd64
           path: LinspirerAppStoreEnumerator.NET/bin/Release/net6.0/
+  win_amd64:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Initialize .NET Environment
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.x'
+          
+      - name: Build the project
+        run: |
+          dotnet build -c Release
+          copy LinspirerAppStoreEnumerator.NET\binary\* LinspirerAppStoreEnumerator.NET\bin\Release\net6.0\
+
+      - name: Upload build
+        uses: actions/upload-artifact@v3
+        with:
+          name: build_linux_amd64
+          path: LinspirerAppStoreEnumerator.NET\bin\Release\net6.0\
+
+
